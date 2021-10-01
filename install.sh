@@ -35,7 +35,7 @@ echo -e "\033[1;33mGetting default interface name\033[0m"
 INTERFACE=$(route | grep '^default' | grep -o '[^ ]*$')
 PRIVATEIP=$(/sbin/ifconfig $INTERFACE | grep -i mask | awk '{print $2}'| cut -f2 -d:)
 OLDHOSTNAME = hostname
-sed -i 's|$OLDHOSTANME|$ServerName|g' /etc/hosts
+sed -i 's|$OLDHOSTNAME|$ServerName|g' /etc/hosts
 hostnamectl set-hostname $ServerName
 echo "${PRIVATEIP} ${ServerName}" >> /etc/hosts
 
