@@ -1,9 +1,46 @@
 #!/bin/bash
 
-INTERFACE=$(route | grep '^default' | grep -o '[^ ]*$')
-IPPRIVADA=$(/sbin/ifconfig $INTERFACE | grep -i mask | awk '{print $2}'| cut -f2 -d:)
-echo $IPPRIVADA
+for ARGUMENT in "$@"
+do
 
+  KEY=$(echo $ARGUMENT | cut -f1 -d=)
+  VALUE=$(echo $ARGUMENT | cut -f2 -d=)
+
+case "$KEY" in
+            ServerName)              ServerName=${VALUE} ;;
+            Role)    Role=${VALUE} ;;
+            *)
+    esac
+done
+
+echo "SERVER_NAME = $ServerName"
+echo "Role = $Role"
+
+if ! [ "$ServerName" ]; then
+   echo "\033[1;33mServer Name:\033[0m"
+   read ServerName
+fi
+
+if ! [ "$Role" ]; then
+   echo "\033[1;33mRole (values-case-sensitive: Master/Node)\033[0m"
+   read Role
+fi
+
+echo -e "\033[1;33mDisabling swap\033[0m"
+swapoff -a
+sed -i 's|/swap|# /swap|g' /etc/fstab
+
+echo -e "\033[1;33mGetting default interface name\033[0m"
+
+INTERFACE=$(route | grep '^default' | grep -o '[^ ]*$')
+PRIVATEIP=$(/sbin/ifconfig $INTERFACE | grep -i mask | awk '{print $2}'| cut -f2 -d:)
+OLDHOSTNAME = hostname
+sed -i 's|$OLDHOSTANME|$ServerName|g' /etc/hosts
+hostnamectl set-hostname $ServerName
+echo "${PRIVATEIP} ${ServerName}" >> /etc/hosts
+
+
+apt install -y docker.io docker-compose
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
 deb http://apt.kubernetes.io/ kubernetes-xenial main
@@ -13,7 +50,7 @@ apt-get install -y kubelet kubeadm kubectl
 
 sed -i 's|Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf"|Env>
 
-sudo kubeadm init --apiserver-advertise-address=$IPPRIVADA --pod-network-cidr=192.168.0.0/16
+sudo kubeadm init --apiserver-advertise-address=$PRIVATEIP --pod-network-cidr=192.168.0.0/16
 
 mkdir addons
 cd addons
