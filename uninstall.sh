@@ -1,6 +1,6 @@
 #!/bin/bash
 kubeadm reset -f
-rm -rf /etc/cni /etc/kubernetes /var/lib/dockershim /var/lib/etcd /var/lib/kubelet /var/run/kubernetes /home/miflop/.kube/* #~/.kube/*
+rm -rf /etc/cni /etc/kubernetes /var/lib/dockershim /var/lib/etcd /var/lib/kubelet /var/run/kubernetes /home/$USER/.kube/* #~/.kube/*
 iptables -F && iptables -X
 iptables -t nat -F && iptables -t nat -X
 iptables -t raw -F && iptables -t raw -X
