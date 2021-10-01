@@ -30,8 +30,8 @@ echo -e "\033[1;33mDisabling swap\033[0m"
 swapoff -a
 sed -i 's|/swap|# /swap|g' /etc/fstab
 
+apt install -y net-tools
 echo -e "\033[1;33mGetting default interface name\033[0m"
-
 INTERFACE=$(route | grep '^default' | grep -o '[^ ]*$')
 PRIVATEIP=$(/sbin/ifconfig $INTERFACE | grep -i mask | awk '{print $2}'| cut -f2 -d:)
 OLDHOSTNAME = hostname
