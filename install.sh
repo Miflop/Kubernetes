@@ -17,12 +17,12 @@ echo "SERVER_NAME = $ServerName"
 echo "Role = $Role"
 
 if ! [ "$ServerName" ]; then
-   echo "\033[1;33mServer Name:\033[0m"
+   echo -e "\033[1;33mServer Name\033[0m"
    read ServerName
 fi
 
 if ! [ "$Role" ]; then
-   echo "\033[1;33mRole (values-case-sensitive: Master/Node)\033[0m"
+   echo -e "\033[1;33mRole (values case sensitive Master/Node)\033[0m"
    read Role
 fi
 
@@ -32,12 +32,12 @@ sed -i 's|/swap|# /swap|g' /etc/fstab
 
 apt install -y net-tools
 echo -e "\033[1;33mGetting default interface name\033[0m"
-INTERFACE=$(route | grep '^default' | grep -o '[^ ]*$')
-PRIVATEIP=$(/sbin/ifconfig $INTERFACE | grep -i mask | awk '{print $2}'| cut -f2 -d:)
-OLDHOSTNAME = hostname
-sed -i 's|$OLDHOSTNAME|$ServerName|g' /etc/hosts
+Interface=$(route | grep '^default' | grep -o '[^ ]*$')
+PrivateIp=$(/sbin/ifconfig $Interface | grep -i mask | awk '{print $2}'| cut -f2 -d:)
+OldHostname = hostname
+sed -i 's|$OldHostname|$ServerName|g' /etc/hosts
 hostnamectl set-hostname $ServerName
-echo "${PRIVATEIP} ${ServerName}" >> /etc/hosts
+echo "${PrivateIp} ${ServerName}" >> /etc/hosts
 
 
 apt install -y docker.io docker-compose
@@ -50,22 +50,28 @@ apt-get install -y kubelet kubeadm kubectl
 
 sed -i 's|Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf"|Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/k>etes/kubelet.conf --cgroup-driver=cgroupfs"|g' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 
-sudo kubeadm init --apiserver-advertise-address=$PRIVATEIP --pod-network-cidr=192.168.0.0/16
+sudo kubeadm init --apiserver-advertise-address=$PrivateIp --pod-network-cidr=192.168.0.0/16
 
 mkdir addons
 cd addons
 sudo curl https://docs.projectcalico.org/manifests/calico.yaml -O
 cd ..
 
-#mv  $HOME/.kube $HOME/.kube.bak
-#sudo mkdir $HOME/.kube
-#sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-#sudo chown $(id -u):$(id -g) $HOME/.kube/config
-echo "--------------------------------------"
-echo "ALLOW YOUR USER TO USE KUBECTL NO SUDO"
-echo "chown -R USER HOME/.kube"
-#export KUBECONFIG=/etc/kubernetes/admin.conf
-echo "kubeadm token create --print-join-command  ## TO JOIN TOKEN"
-echo "-----------------------------------------------------------"
+echo -e "\033[1;33m-------------------- NON ROOT USER ---------------------\033[0m"
+echo -e "\033[1;33mmv  $HOME/.kube $HOME/.kube.bak\033[0m"
+echo -e "\033[1;33msudo mkdir $HOME/.kube\033[0m"
+echo -e "\033[1;33msudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config\033[0m"
+echo -e "\033[1;33msudo chown \$(id -u):\$(id -g) $HOME/.kube/config\033[0m"
+echo ""
+echo -e "\033[1;33m------------------ ROOT USER ---------------\033[0m"
+echo -e "\033[1;33mexport KUBECONFIG=/etc/kubernetes/admin.conf\033[0m"
+echo -e "\033[1;33m--------------------------------------------\033[0m"
+echo ""
+echo -e "\033[1;33mALLOW YOUR USER TO USE KUBECTL NO SUDO\033[0m"
+echo -e "\033[1;33mchown -R \$USER \$HOME/.kube\033[0m"
+echo ""
+echo -e "\033[1;33m---------- GET JOIN TOKEN WITH ----------\033[0m"
+echo -e "\033[1;33mkubeadm token create --print-join-command\033[0m"
+echo -e "\033[1;33m-----------------------------------------\033[0m"
 
 kubectl apply -f addons/calico.yaml
