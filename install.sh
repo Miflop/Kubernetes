@@ -50,7 +50,7 @@ apt-get install -y kubelet kubeadm kubectl
 
 sed -i 's|Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf"|Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/k>etes/kubelet.conf --cgroup-driver=cgroupfs"|g' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 
-bash -c sudo kubeadm init --apiserver-advertise-address=$PrivateIp --pod-network-cidr=192.168.0.0/16
+sudo kubeadm init --apiserver-advertise-address=$PrivateIp --pod-network-cidr=192.168.0.0/16
 
 mkdir addons
 cd addons
