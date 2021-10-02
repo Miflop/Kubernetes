@@ -54,22 +54,20 @@ sudo kubeadm init --apiserver-advertise-address=$PrivateIp --pod-network-cidr=19
 
 mkdir addons
 cd addons
-sudo curl https://docs.projectcalico.org/manifests/calico.yaml -O
+curl https://docs.projectcalico.org/manifests/calico.yaml -O
 cd ..
-sudo kubectl apply -f addons/calico.yaml
+kubectl apply -f addons/calico.yaml
 
 echo -e "\033[1;33m-------------------- NON ROOT USER ---------------------\033[0m"
-echo -e "\033[1;33msudo rmdir \$HOME/.kube --ignore-fail-on-non-empty033[0m"
+echo -e "\033[1;33msudo rmdir \$HOME/.kube --ignore-fail-on-non-empty\033[0m"
 echo -e "\033[1;33msudo mkdir \$HOME/.kube\033[0m"
 echo -e "\033[1;33msudo cp -i /etc/kubernetes/admin.conf \$HOME/.kube/config\033[0m"
 echo -e "\033[1;33msudo chown \$(id -u):\$(id -g) \$HOME/.kube/config\033[0m"
+echo -e "\033[1;33mchown -R \$USER \$HOME/.kube\033[0m"
 echo ""
 echo -e "\033[1;33m------------------ ROOT USER ---------------\033[0m"
 echo -e "\033[1;33mexport KUBECONFIG=/etc/kubernetes/admin.conf\033[0m"
 echo -e "\033[1;33m--------------------------------------------\033[0m"
-echo ""
-echo -e "\033[1;33mALLOW YOUR USER TO USE KUBECTL NO SUDO\033[0m"
-echo -e "\033[1;33mchown -R \$USER \$HOME/.kube\033[0m"
 echo ""
 echo -e "\033[1;33m---------- GET JOIN TOKEN WITH ----------\033[0m"
 echo -e "\033[1;33mkubeadm token create --print-join-command\033[0m"
