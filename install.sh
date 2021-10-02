@@ -60,7 +60,6 @@ kubectl apply -f addons/calico.yaml
 
 echo -e "\033[1;33m-------------------- NON ROOT USER ---------------------\033[0m"
 echo -e "\033[1;33msudo rmdir \$HOME/.kube --ignore-fail-on-non-empty\033[0m"
-echo -e "\033[1;33msudo mkdir \$HOME/.kube\033[0m"
 echo -e "\033[1;33msudo cp -i /etc/kubernetes/admin.conf \$HOME/.kube/config\033[0m"
 echo -e "\033[1;33msudo chown \$(id -u):\$(id -g) \$HOME/.kube/config\033[0m"
 echo -e "\033[1;33mchown -R \$USER \$HOME/.kube\033[0m"
